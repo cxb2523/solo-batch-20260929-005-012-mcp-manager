@@ -8,11 +8,7 @@ import { TerminalCommand } from "@/components/terminal-command"
 import { SERVER_CONFIGS } from "@/server-configs"
 import { ArrowUpRight, Trash2 } from "lucide-react"
 
-type MCPServerConfig = {
-	command: string
-	args: string[]
-	env?: Record<string, string>
-}
+import type { MCPServer as MCPServerConfig } from "@/lib/import-mcp-config"
 
 type MCPServerCardProps = {
 	serverName: string

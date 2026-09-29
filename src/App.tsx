@@ -1,19 +1,15 @@
 import { ApplyingInstructions } from "@/components/applying-instructions"
 import { LoadingInstructions } from "@/components/loading-instructions"
 import { MCPServers } from "@/components/mcp-servers"
+import { type MCPConfig, loadStoredConfig } from "@/lib/import-mcp-config"
 import { SERVER_CONFIGS } from "@/server-configs"
 import type React from "react"
 import { useState } from "react"
 
 function App() {
-	const [jsonContent, setJsonContent] = useState<{
-		mcpServers: Record<
-			string,
-			{ command: string; args: string[]; env?: Record<string, string> }
-		>
-	}>({
-		mcpServers: {}
-	})
+	const [jsonContent, setJsonContent] = useState<MCPConfig>(() =>
+		loadStoredConfig()
+	)
 	const [uploadStatus, setUploadStatus] = useState<
 		"idle" | "success" | "error"
 	>("idle")
@@ -21,7 +17,7 @@ function App() {
 
 	const handleJsonInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		try {
-			const content = JSON.parse(e.target.value)
+			const content = JSON.parse(e.target.value) as MCPConfig
 			setJsonContent(content)
 			setUploadStatus("success")
 			setIsInstructionsOpen(false) // Close accordion on successful upload
@@ -94,7 +90,7 @@ function App() {
 						<br />
 						In a nutshell, MCP servers are like plugins that give
 						Claude (the "client") prompts, resources, and tools to
-						perform actions on your behalf. Read the{" "}
+						perform actions on behalf. Read the{" "}
 						<a
 							href="https://modelcontextprotocol.io"
 							className="link"
@@ -130,34 +126,22 @@ function App() {
 						uploadStatus={uploadStatus}
 					/>
 
-					{Object.keys(jsonContent).length > 0 &&
-						uploadStatus === "success" && (
-							<div className="space-y-6">
-								<MCPServers
-									jsonContent={{
-										mcpServers:
-											jsonContent.mcpServers as Record<
-												string,
-												{
-													command: string
-													args: string[]
-													env?: Record<string, string>
-												}
-											>
-									}}
-									onUpdate={setJsonContent}
-									onServerAdd={handleServerAdd}
-									onServerRemove={handleServerRemove}
-								/>
+					{Object.keys(jsonContent.mcpServers).length > 0 && (
+						<div className="space-y-6">
+							<MCPServers
+								jsonContent={jsonContent}
+								onUpdate={setJsonContent}
+								onServerAdd={handleServerAdd}
+								onServerRemove={handleServerRemove}
+							/>
 
-								{Object.keys(jsonContent.mcpServers).length >
-									0 && (
-									<ApplyingInstructions
-										jsonContent={jsonContent}
-									/>
-								)}
-							</div>
-						)}
+							{Object.keys(jsonContent.mcpServers).length > 0 && (
+								<ApplyingInstructions
+									jsonContent={jsonContent}
+								/>
+							)}
+						</div>
+					)}
 				</div>
 				<div className="flex justify-center my-16">
 					<span className="text-sm text-center text-black/50">

@@ -1,16 +1,9 @@
 import { TerminalCommand } from "@/components/terminal-command"
+import type { MCPConfig } from "@/lib/import-mcp-config"
 import { SERVER_CONFIGS } from "@/server-configs"
-import type { ServerConfig } from "@/server-configs"
-
-type RuntimeServerConfig = {
-	command: string
-	args: string[]
-	env?: Record<string, string>
-}
 
 type ApplyingInstructionsProps = {
-	jsonContent: {
-		mcpServers: Record<string, RuntimeServerConfig>
+	jsonContent: MCPConfig & {
 		cloudflare?: unknown
 	}
 }

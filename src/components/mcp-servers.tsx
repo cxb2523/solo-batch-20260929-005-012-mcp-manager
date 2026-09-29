@@ -1,20 +1,9 @@
+import { ImportConfigModal } from "@/components/import-config-modal"
 import { MCPServerCard } from "@/components/mcp-server-card"
+import type { MCPConfig, MCPServer } from "@/lib/import-mcp-config"
 import { SERVER_CONFIGS } from "@/server-configs"
 import { capitalizeFirstLetter } from "@/utils"
-import { Plus, Save, X } from "lucide-react"
-
-type MCPServer = {
-	command: string
-	args: string[]
-}
-
-type MCPServers = {
-	[key: string]: MCPServer
-}
-
-type MCPConfig = {
-	mcpServers: MCPServers
-}
+import { FileUp, Plus, X } from "lucide-react"
 
 type MCPServersProps = {
 	jsonContent: MCPConfig
@@ -64,6 +53,20 @@ export function MCPServers({
 					>
 						<Plus className="w-4 h-4" />
 						<span>Add Server</span>
+					</button>
+					<button
+						type="button"
+						className="btn btn-outline btn-primary btn-sm"
+						onClick={() =>
+							(
+								document.getElementById(
+									"import_config_modal"
+								) as HTMLDialogElement
+							)?.showModal()
+						}
+					>
+						<FileUp className="w-4 h-4" />
+						<span>批量导入 JSON</span>
 					</button>
 				</div>
 			</div>
@@ -135,6 +138,8 @@ export function MCPServers({
 					<button type="button">close</button>
 				</form>
 			</dialog>
+
+			<ImportConfigModal config={jsonContent} onImported={onUpdate} />
 
 			<div className="space-y-4">
 				{hasServers ? (
