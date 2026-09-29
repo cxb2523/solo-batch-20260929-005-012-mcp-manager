@@ -1,23 +1,36 @@
 import { ApplyingInstructions } from "@/components/applying-instructions"
 import { LoadingInstructions } from "@/components/loading-instructions"
 import { MCPServers } from "@/components/mcp-servers"
+import {
+	type MCPConfig,
+	STORAGE_KEY,
+	loadMcpConfig
+} from "@/lib/import-mcp-config"
 import { SERVER_CONFIGS } from "@/server-configs"
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 function App() {
-	const [jsonContent, setJsonContent] = useState<{
-		mcpServers: Record<
-			string,
-			{ command: string; args: string[]; env?: Record<string, string> }
-		>
-	}>({
-		mcpServers: {}
-	})
+	const [jsonContent, setJsonContent] = useState<MCPConfig>(() =>
+		loadMcpConfig()
+	)
 	const [uploadStatus, setUploadStatus] = useState<
 		"idle" | "success" | "error"
-	>("idle")
-	const [isInstructionsOpen, setIsInstructionsOpen] = useState(true)
+	>(() =>
+		Object.keys(loadMcpConfig().mcpServers).length > 0 ? "success" : "idle"
+	)
+	const [isInstructionsOpen, setIsInstructionsOpen] = useState(
+		() => Object.keys(loadMcpConfig().mcpServers).length === 0
+	)
+
+	// 任意来源的配置变更都同步到本地存储
+	useEffect(() => {
+		try {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(jsonContent))
+		} catch (error) {
+			console.error("Failed to persist MCP config:", error)
+		}
+	}, [jsonContent])
 
 	const handleJsonInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		try {
@@ -59,6 +72,12 @@ function App() {
 				mcpServers: rest
 			})
 		}
+	}
+
+	const handleImportConfig = (newContent: MCPConfig) => {
+		setJsonContent(newContent)
+		setUploadStatus("success")
+		setIsInstructionsOpen(false)
 	}
 
 	return (
@@ -134,20 +153,11 @@ function App() {
 						uploadStatus === "success" && (
 							<div className="space-y-6">
 								<MCPServers
-									jsonContent={{
-										mcpServers:
-											jsonContent.mcpServers as Record<
-												string,
-												{
-													command: string
-													args: string[]
-													env?: Record<string, string>
-												}
-											>
-									}}
+									jsonContent={jsonContent}
 									onUpdate={setJsonContent}
 									onServerAdd={handleServerAdd}
 									onServerRemove={handleServerRemove}
+									onImportConfig={handleImportConfig}
 								/>
 
 								{Object.keys(jsonContent.mcpServers).length >

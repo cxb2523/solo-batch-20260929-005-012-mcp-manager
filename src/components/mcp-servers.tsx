@@ -1,19 +1,22 @@
+import { ImportMcpConfigModal } from "@/components/import-mcp-config-modal"
 import { MCPServerCard } from "@/components/mcp-server-card"
 import { SERVER_CONFIGS } from "@/server-configs"
 import { capitalizeFirstLetter } from "@/utils"
-import { Plus, Save, X } from "lucide-react"
+import { FileUp, Plus, X } from "lucide-react"
 
 type MCPServer = {
-	command: string
-	args: string[]
+	command?: string
+	url?: string
+	args?: string[]
+	env?: Record<string, string>
 }
 
-type MCPServers = {
+type MCPServersType = {
 	[key: string]: MCPServer
 }
 
 type MCPConfig = {
-	mcpServers: MCPServers
+	mcpServers: MCPServersType
 }
 
 type MCPServersProps = {
@@ -21,13 +24,15 @@ type MCPServersProps = {
 	onUpdate: (newContent: MCPConfig) => void
 	onServerAdd: (serverType: keyof typeof SERVER_CONFIGS) => void
 	onServerRemove: (serverType: string) => void
+	onImportConfig: (newContent: MCPConfig) => void
 }
 
 export function MCPServers({
 	jsonContent,
 	onUpdate,
 	onServerAdd,
-	onServerRemove
+	onServerRemove,
+	onImportConfig
 }: MCPServersProps) {
 	const handleServerUpdate = (name: string, newConfig: MCPServer) => {
 		const updatedContent = {
@@ -65,8 +70,27 @@ export function MCPServers({
 						<Plus className="w-4 h-4" />
 						<span>Add Server</span>
 					</button>
+					<button
+						type="button"
+						className="btn btn-outline btn-primary btn-sm"
+						onClick={() =>
+							(
+								document.getElementById(
+									"import_mcp_config_modal"
+								) as HTMLDialogElement
+							)?.showModal()
+						}
+					>
+						<FileUp className="w-4 h-4" />
+						<span>批量导入 JSON 配置</span>
+					</button>
 				</div>
 			</div>
+
+			<ImportMcpConfigModal
+				existing={jsonContent.mcpServers}
+				onImported={onImportConfig}
+			/>
 
 			<dialog id="add_server_modal" className="modal backdrop-blur-sm">
 				<div className="modal-box rounded-3xl">

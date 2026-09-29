@@ -3,8 +3,9 @@ import { SERVER_CONFIGS } from "@/server-configs"
 import type { ServerConfig } from "@/server-configs"
 
 type RuntimeServerConfig = {
-	command: string
-	args: string[]
+	command?: string
+	url?: string
+	args?: string[]
 	env?: Record<string, string>
 }
 

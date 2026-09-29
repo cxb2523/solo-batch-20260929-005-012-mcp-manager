@@ -9,8 +9,9 @@ import { SERVER_CONFIGS } from "@/server-configs"
 import { ArrowUpRight, Trash2 } from "lucide-react"
 
 type MCPServerConfig = {
-	command: string
-	args: string[]
+	command?: string
+	url?: string
+	args?: string[]
 	env?: Record<string, string>
 }
 
@@ -32,7 +33,7 @@ export function MCPServerCard({
 	const handleFilesystemUpdate = (paths: string[]) => {
 		const newConfig = {
 			...config,
-			args: [...config.args.slice(0, 2), ...paths]
+			args: [...(config.args ?? []).slice(0, 2), ...paths]
 		}
 		onUpdate(serverName, newConfig)
 	}
@@ -40,7 +41,7 @@ export function MCPServerCard({
 	const handlePostgresUpdate = (url: string) => {
 		const newConfig = {
 			...config,
-			args: [...config.args.slice(0, 2), url]
+			args: [...(config.args ?? []).slice(0, 2), url]
 		}
 		onUpdate(serverName, newConfig)
 	}
@@ -74,7 +75,7 @@ export function MCPServerCard({
 	const handleObsidianUpdate = (path: string) => {
 		const newConfig = {
 			...config,
-			args: [...config.args.slice(0, 2), path]
+			args: [...(config.args ?? []).slice(0, 2), path]
 		}
 		onUpdate(serverName, newConfig)
 	}
@@ -82,7 +83,7 @@ export function MCPServerCard({
 	const handleSentryUpdate = (token: string) => {
 		const newConfig = {
 			...config,
-			args: [...config.args.slice(0, 2), token]
+			args: [...(config.args ?? []).slice(0, 2), token]
 		}
 		onUpdate(serverName, newConfig)
 	}
